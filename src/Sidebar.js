@@ -12,7 +12,7 @@ function Sidebar() {
     return (
         <div className="sidebar">
             <div className="sidebar__header">
-                <Avatar />
+                <Avatar src={`https://avatars.dicebear.com/api/human/asd${Math.random()}.svg`}/>
                 <div className="sidebar__headerRight">
                     <IconButton>
                         <DonutLargeIcon />
