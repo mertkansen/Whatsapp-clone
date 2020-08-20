@@ -24,7 +24,7 @@
 
 .sidebar__searchContainer > .MuiSvgIcon-root {
     color: gray;
-    
+
 }
 
 .sidebar__searchContainer > input {
@@ -50,4 +50,10 @@
 .sidebar__headerRight > .MuiSvgIcon-root {
     margin-right: 2vw;
     font-size: 24px !important; 
+}
+
+.sidebar__chats {
+    flex: 1;
+    background-color: white;
+    overflow: scroll;
 }
