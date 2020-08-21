@@ -7,9 +7,12 @@ import SearchOutlined from '@material-ui/icons/SearchOutlined';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import MicIcon from '@material-ui/icons/Mic';
 
+
+
 function Chat() {
     const [seed, setSeed] = useState('')
     const [input, setInput] = useState('')
+    
 
     useEffect(() => {
         setSeed(Math.random())

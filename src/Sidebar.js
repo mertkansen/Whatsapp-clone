@@ -8,17 +8,23 @@ import ChatIcon from '@material-ui/icons/Chat';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchOutlined from '@material-ui/icons/SearchOutlined';
 import SidebarChat from './SidebarChat';
+import { useParams } from 'react-router-dom';
 
 function Sidebar() {
     const [rooms, setRooms] = useState([])
+    const { roomId } = useParams()
 
-    useEffect(() => { 
-        db.collection('rooms').onSnapshot(snapshot => {
+    useEffect(() => {  // Gets snapshot from rooms collection from db
+        const unsubscribe = db.collection('rooms').onSnapshot(snapshot => {
             setRooms(snapshot.docs.map(doc => ({
                 id: doc.id,
                 data: doc.data(),
             }))
         )})
+
+        return () => {
+            unsubscribe() // With this, we cleaned it up when we finished using db
+        }
     }, [])
 
     return (
