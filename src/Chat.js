@@ -1,26 +1,68 @@
 import React, { useState, useEffect } from 'react'
+import firebase from './firebase'
+import db from './firebase';
+import { useParams } from 'react-router-dom';
 import './Chat.css'
+
 import { Avatar, IconButton } from '@material-ui/core'
 import AttachFile from '@material-ui/icons/AttachFileOutlined';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchOutlined from '@material-ui/icons/SearchOutlined';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import MicIcon from '@material-ui/icons/Mic';
-
-
+import { useStateValue } from './StateProvider';
 
 function Chat() {
     const [seed, setSeed] = useState('')
     const [input, setInput] = useState('')
-    
+    const { roomId } = useParams()
+    const [roomName, setRoomName] = useState('')
+    const [messages, setMessages] = useState([])
+    const [{user}, dispatch] = useStateValue()
 
     useEffect(() => {
-        setSeed(Math.random())
-    }, [])
+        if (roomId) {
+            setSeed(Math.random() * 5000)
+            
+            db
+                .collection('rooms')
+                .doc(roomId)
+                .onSnapshot(snapshot => setRoomName(snapshot.data().name))
 
+            db
+                .collection('rooms')
+                .doc(roomId)
+                .collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => 
+                    setMessages(
+                        snapshot
+                            .docs
+                            .map( doc => doc.data()
+                        )
+                    ))
+        }
+        
+    }, [roomId])
+
+    // Here, We send message
     function sendMessage(e) {
         e.preventDefault()
-        console.log(input)
+
+        db
+            .collection('rooms')
+            .doc(roomId)
+            .collection('messages')
+            .add({
+                message: input,
+
+                // this comes from google authentication
+                name: user.displayName,
+
+                // This will get the servers timestamp
+                timestamp: new Date()
+            })
+
         setInput('')
     }
 
@@ -30,8 +72,13 @@ function Chat() {
                 <Avatar src={`https://avatars.dicebear.com/api/human/asd${seed}.svg`} />
 
                 <div className="chat__headerInfo">
-                    <h3>Room name</h3>
-                    <p>Last seen</p>
+                    <h3>{roomName}</h3>
+                    <p>
+                        Last seen{' '}  
+                        { new Date(
+                            messages[messages.length - 1]?.timestamp?.toDate()).toUTCString()
+                         }
+                        </p>
                 </div>
 
                 <div className="chat__headerRight">
@@ -48,11 +95,20 @@ function Chat() {
             </div>
 
             <div className="chat__body">
-                <p className={`chat__message  ${true && 'chat__reciever'}`}>
-                <span className="chat__name">Mertkan Şen</span>
-                Hey Girlz!
-                <span className="chat__timestamp">3:52pm</span>
-                </p>
+                {messages.map(message => (
+                    <p 
+                        className={
+                            `chat__message  ${
+                                message.name === user.displayName && 'chat__reciever'}`}
+                    >
+
+                    <span className="chat__name">{message.name}</span>
+                    {message.message}
+                    <span className="chat__timestamp">
+                        { new Date(messages[messages.length - 1]?.timestamp?.toDate()).toUTCString() }
+                    </span>
+                    </p>
+                )) }
             </div>
 
             <div className="chat__footer">

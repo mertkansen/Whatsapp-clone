@@ -2,17 +2,22 @@ import React, { useState, useEffect } from 'react'
 import './Sidebar.css'
 import db from './firebase'
 
+import { useStateValue } from './StateProvider';
+
+import { useParams } from 'react-router-dom';
+
 import { Avatar, IconButton } from '@material-ui/core';
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
 import ChatIcon from '@material-ui/icons/Chat';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchOutlined from '@material-ui/icons/SearchOutlined';
 import SidebarChat from './SidebarChat';
-import { useParams } from 'react-router-dom';
+
 
 function Sidebar() {
     const [rooms, setRooms] = useState([])
     const { roomId } = useParams()
+    const [{ user }, dispatch] = useStateValue()
 
     useEffect(() => {  // Gets snapshot from rooms collection from db
         const unsubscribe = db.collection('rooms').onSnapshot(snapshot => {
@@ -30,7 +35,7 @@ function Sidebar() {
     return (
         <div className="sidebar">
             <div className="sidebar__header">
-                <Avatar src={`https://avatars.dicebear.com/api/human/asd${Math.random()}.svg`}/>
+                <Avatar src={user?.photoURL}/>
                 <div className="sidebar__headerRight">
                     <IconButton>
                         <DonutLargeIcon />
